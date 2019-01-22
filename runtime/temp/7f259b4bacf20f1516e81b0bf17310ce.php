@@ -1,0 +1,430 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:2:{s:69:"F:\php\wuif1808\shop\public/../application/admin\view\goods\edit.html";i:1544606485;s:62:"F:\php\wuif1808\shop\application\admin\view\common\header.html";i:1543480102;}*/ ?>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>admin</title>
+    <link rel="stylesheet" href="/static/css/element-ui.css">
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/element-ui.js"></script>
+    <script src="/static/js/axios.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,body,#app{
+            width: 100%;
+            height: 100%;
+        }
+        a{
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<style>
+    .avatar-uploader .el-upload {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+    .imgss{
+        position: relative;
+    }
+    .close{
+        position: absolute;
+        right: 0;
+        top: 0;
+        border-radius: 10px;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        color: whitesmoke;
+        background: black;
+    }
+    .edui-default{
+        line-height: 20px;
+    }
+</style>
+<script type="text/javascript" charset="utf-8" src="/static/baidu/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/baidu/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="/static/baidu/lang/zh-cn/zh-cn.js"></script>
+<body>
+<div id="app">
+    <el-breadcrumb separator="/">
+        <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+        <el-breadcrumb-item>修改管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-tabs v-model="activeName"   style="margin-top: 30px">
+        <el-tab-pane label="添加商品" name="edit">
+            <el-form :model="formData" :rules="rules" ref="add" label-width="100px">
+                <el-form-item  label="短商品名" prop="short_name">
+                    <el-input  v-model="formData.short_name" placeholder="请输入短商品名"></el-input>
+                </el-form-item>
+                <el-form-item label="商品名" prop="name">
+                      <el-input v-model="formData.name" placeholder="请输入商品名"></el-input>
+                 </el-form-item>
+                <el-form-item label="商品分类" prop="type_id" >
+                    <el-cascader
+                            ref="select"
+                            :options="options"
+                            :props="props"
+                            @change="changeType"
+                            v-model="formData.selected"
+                            :clearable="clearable"
+                            :show-all-levels="false"
+                    ></el-cascader>
+                    <!--select:是重置的时候设置的-->
+                    <!--options:是级联选择器的数据-->
+                    <!--props:是children层级-->
+                    <!--change： 商品分类的change-->
+                    <!--selected:把字符串转换成数组-->
+                    <!--clearable： 能否关闭-->
+                    <!--levels:展示哪一级-->
+                </el-form-item>
+                <el-form-item label="促销信息" prop="info">
+                    <el-input v-model="formData.info" placeholder="请输入促销信息"></el-input>
+                </el-form-item>
+                <el-form-item label="关键字" prop="keywords">
+                    <el-input  v-model="formData.keywords" placeholder="请输入关键字"></el-input>
+                </el-form-item>
+                <el-form-item label="商品描述" prop="description">
+                    <el-input v-model="formData.description" placeholder="请输入商品描述"></el-input>
+                </el-form-item>
+                <el-form-item label="原价" prop="price">
+                    <el-input v-model="formData.price" type="number" placeholder="请输入商品原价"></el-input>
+                </el-form-item>
+                <el-form-item label="现价" prop="now_price">
+                    <el-input v-model="formData.now_price" type="number" placeholder="请输入商品现价"></el-input>
+                </el-form-item>
+                <el-form-item label="库存" prop="stock">
+                    <el-input v-model="formData.stock" type="number" placeholder="请输入商品库存量"></el-input>
+                </el-form-item>
+
+                <el-form-item label="上下架" prop="is_shelf">
+                    <!--<template>-->
+                        <el-radio v-model="formData.is_shelf" label="0">上架</el-radio>
+                        <el-radio v-model="formData.is_shelf" label="1">下架</el-radio>
+                    <!--</template>-->
+                </el-form-item>
+                <el-form-item label="商品封面图" prop="cover_img">
+                        <el-upload
+                                class="avatar-uploader"
+                                action="/admin/upload/upload?type=tmp"
+                                :show-file-list="false"
+                                :on-success="success"
+                        >
+                                <img v-if="formData.cover_img" :src="formData.cover_img" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                </el-form-item>
+                <el-form-item label="商品更多图" prop="imgs">
+                    <el-upload
+                            class="avatar-uploader"
+                            action="/admin/upload/upload?type=tmp"
+                            :show-file-list="false"
+                            :on-success="successAll"
+                    >
+                        <template v-for="item in formData.imgs" >
+                            <div class="imgss">
+                                <div class="close" @click.stop="delImg(item)">&times;</div>
+                                <img  :src="item" class="avatar">
+                            </div>
+                        </template>
+                        <i  class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="商品详情" prop="">
+                    <div id="editor"  type="text/plain" style="width:100%;height:500px;"></div>
+                </el-form-item>
+                <!--<el-form-item label="用户状态" prop="status">-->
+                    <!--&lt;!&ndash;<template>&ndash;&gt;-->
+                        <!--<el-radio  label="0">白名单</el-radio>-->
+                        <!--<el-radio  label="1">黑名单</el-radio>-->
+                    <!--&lt;!&ndash;</template>&ndash;&gt;-->
+                <!--</el-form-item>-->
+                <el-button type="success" @click="submitData">提交</el-button>
+                <el-button type="danger" @click="resetData">重置</el-button>
+            </el-form>
+        </el-tab-pane>
+    </el-tabs>
+</div>
+</body>
+<script>
+
+
+    //多图问题的解决
+    //1.因为数据库长度不够
+    //2.存放多图数据方式主要分为两种：使用逗号分隔，使用json
+    //  在前台不同的存储方式的处理方式不一样：如果逗号需要转换成数组，如果json字符串需要转换成json对象
+    //str=1.jpg,2.jpg,3.jpg
+    //str.split(",")
+
+    //多图处理的核心思想
+    //1.两个数组记录需要删除的图片和需要存储的数据库的图片
+    //2.需要保留的图片拷贝到指定目录
+    //3.需要删除的图片进行删除
+
+    // 引入百度编辑器
+    var ue = UE.getEditor('editor');
+    let vue=new Vue({
+        el:"#app",
+        data: {
+            //默认显示标签页
+            activeName:"edit",
+            //需要修改的数据
+            formData:{
+
+            },
+            //级联选择器数据
+            //级联选择器 数据
+            options:[],
+            //级联选择器 默认值
+            props:{
+                value:"id",
+                label:"name",
+                children:"children"
+            },
+            //默认值
+            selected:[],
+            //级联选择器能否关闭
+            clearable:true,
+            //表单验证规则
+            rules:{
+                short_name:[
+                    { required: true, message: '请输入商品短名称', trigger: 'blur' },
+                ],
+                name:[
+                    { required: true, message: '请输入商品名称', trigger: 'blur' },
+                ],
+                keywords:[
+                    { required: true, message: '请输入商品关键字', trigger: 'blur' },
+                ],
+                description:[
+                    { required: true, message: '请输入商品描述', trigger: 'blur' },
+                ],
+                price:[
+                    { required: true, message: '请输入商品原价', trigger: 'blur' },
+                ],
+                now_price:[
+                    { required: true, message: '请输入商品现价', trigger: 'blur' },
+                ],
+                stock:[
+                    { required: true, message: '请输入商品库存', trigger: 'blur' },
+                ],
+                cover_img:[
+                    { required: true, message: '请选择上传封面图片', trigger: 'blur' },
+                ],
+                imgs:[
+                    { required: true, message: '请选择上传更多图片', trigger: 'blur' },
+                ],
+                type_id:[
+                    { required: true, message: '请选择商品分类', trigger: 'change' },
+                ],
+
+            },
+
+        },
+        //方法
+        methods:{
+            // 获取网站的分类信息
+            getTypeData(){
+                // 发送请求
+                axios.get("/admin/type/getdata")
+                // 监听数据
+                    .then(response=>{
+                        // 设置初始化数据
+                        this.options = response.data;
+                    })
+                    .catch(error=>{
+
+                    });
+
+            },
+            //获取用户修改的数据
+          getGoodsEditData(){
+              //发送请求
+              if(this.id>0){
+                  //发送请求
+                  axios.get("/admin/goods/editdata?id="+this.id)
+                      .then(response=>{
+
+                          this.formData=response.data;
+                          this.formData.deleteImg=[]; //定义一个删除的数组
+                          this.formData.old_cover_img=response.data.cover_img;
+                          //解决级联选择器
+                          this.formData.selected=[];
+                          //将字符串转换成数组
+                          //0,1,3
+
+                          let arr=response.data.path.split(",");
+
+                          //["0","1","3",""]
+                          arr.shift();
+
+                          //["1","3",""]
+                          arr.pop();
+                          //["1","3"]
+
+                          arr.push(response.data.type_id);
+                          //["1","3",6]
+
+                          let brr=[];
+                          arr.forEach(item=>{
+                              // console.log(item); // 1 2 3  1 2是字符串，3是数字
+                               brr.push(Number(item));
+                          });
+                          //[1,3,6];
+                          this.formData.selected=brr;
+                          // this.formData.selected=arr;
+                          //解决上下架
+                          this.formData.is_shelf=response.data.is_shelf+"";
+
+                          //解决更多图
+                          // this.formData.imgs=eval("("+response.data.imgs+")");
+                          // console.log(this.formData.imgs);  //是一个数组，里面放有图片
+                          this.formData.imgs=JSON.parse(response.data.imgs);  //JSON格式这样输出
+                          // this.formData.imgs=response.data.imgs.split(",");  //字符串分割的方式
+
+                          //解决百度编辑器
+                          // alert(this.formData.text);
+                          // alert(ue);
+                          // ue.setContent('1111111111111111111');
+                          // editor.setContent(this.formData.text);
+                          ue.ready(()=>{
+                              //设置编辑器内容
+                              ue.setContent(this.formData.text);
+                          });
+
+                      })
+                      .catch();
+              }else{
+                  history.go(-1); //返回上一页
+              }
+          },
+            //商品分类的change
+            changeType(val){
+                // console.log(val);  //是一个数组
+
+                this.formData.type_id=val[val.length-1];
+                // console.log(val[val.length-1])  //数组的最后一个
+            },
+            //重置数据
+            resetData(){
+                //重置表单的提示框
+                this.$refs['add'].resetFields();
+                //文本编辑器里的清空
+                this.getGoodsEditData();
+            },
+            //提交数据
+            submitData(){
+                //判断验证是否通过
+                this.$refs['add'].validate(valid=>{
+                    //判断规则是否验证通过
+                    if(valid){
+                        //设置文本域的数据
+                        this.formData.text=ue.getContent(); //把文本框里的东西赋值给text
+                        //设置文本域的数据
+                        let datas=this.formData;
+                        //删除不需要的数据
+                        delete datas.create_time;
+                        delete datas.selected;
+                        delete datas.path;
+
+                        // console.log(datas); //所有信息
+                        // console.log(this.formData.text); //文本框里的东西
+                        axios.post("/admin/goods/update",datas)
+                            .then(response=>{
+                                if(response.data===1){
+                                    this.$notify({
+                                        type:"success",
+                                        message:"修改成功"
+                                    });
+                                    setTimeout(function () {
+                                        window.location.href="/admin/goods/index";
+                                    },1000);
+                                }else{
+                                    this.$notify({
+                                        type:"error",
+                                        message:"修改失败"
+                                    })
+                                }
+                            })
+                            .catch(error=>{
+                                this.$notify({
+                                    type:"error",
+                                    message:"未知错误"
+                                })
+                            });
+                    }else{
+                        //
+                        return false;
+                    }
+                });
+            },
+            //上传封面图片
+            success(val){
+                //让每个值等于新的值
+                this.formData.cover_img=val;
+            },
+            //删除不想要的图片
+            delImg(item){
+                // alert(item); //对应的图片
+                //过滤掉删除的图片
+                this.formData.imgs=this.formData.imgs.filter(val=>{
+                    return item!=val;  //返回不等于点击的对应的，再令this.formData.img=arr，即可删除
+                });
+                //记录删除的图片
+                this.formData.deleteImg.push(item);   //在此之前需要在getGoodsEditData前写一个数组
+                // console.log(this.formData.deleteImg);
+            },
+            successAll(val){
+                //追加到数据中
+                this.formData.imgs.push(val);
+            },
+        },
+        //钩子函数
+        created(){
+            //获取地址栏上的参数
+            let arr=window.location.search.split("=");
+            // alert(arr); ?id,13
+            //设置当前数据的ID
+            this.id=arr[arr.length-1];
+            // alert(this.id);  13
+            //发送请求获取数据
+            this.getGoodsEditData();
+
+            //获去type的数据
+            this.getTypeData();
+        }
+})
+</script>
+</html>

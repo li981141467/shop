@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/static/js/axios.js"></script>
+</head>
+<body>
+<script>
+    // axios.get("/test/test/get?name=zhangsan").then(res=>{
+    //     console.log(res);
+    // });
+    // axios.post("/test/test/post",{
+    //     age:18,sex:"man"}).then(res=>{
+    //         console.log(res)
+    // });
+    // axios.put("/test/test/put",{id:1,name:"张三"}).then(res=>{
+    //     console.log(res);
+    // });
+    // axios.delete("/test/test/delete",{data:{id:1}}).then(res=>{
+    //     console.log(res);
+    // })
+
+    axios.get("/test/test/user?name=zhangsan").then(res=>{
+        console.log(res);
+    });
+   // 以上第一种
+    axios.get("/test/test/user",{params:{id:1}}).then(res=>{
+        console.log(res);
+    });
+    axios.post("/test/test/user",{name:"zhangsan"}).then(res=>{
+        console.log(res);
+    });
+    axios.put("/test/test/user",{id:1}).then(res=>{
+        console.log(res);
+    });
+    axios.delete("/test/test/user",{id:1}).then(res=>{
+        console.log(res);
+    });
+</script>
+</body>
+</html>
